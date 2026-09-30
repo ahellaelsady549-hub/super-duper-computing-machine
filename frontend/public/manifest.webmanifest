@@ -1,0 +1,11 @@
+{
+  "name":"REFLECT | Graduation & Apparel",
+  "short_name":"REFLECT",
+  "lang":"ar",
+  "dir":"rtl",
+  "display":"standalone",
+  "start_url":"/",
+  "background_color":"#f8f6f0",
+  "theme_color":"#0b1f42",
+  "icons":[{"src":"/reflect-logo.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any"}]
+}

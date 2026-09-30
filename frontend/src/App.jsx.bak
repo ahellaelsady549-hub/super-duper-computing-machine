@@ -1,0 +1,61 @@
+import React,{useEffect,useState} from 'react';
+import {ShoppingBag,Users,MessageCircle,ArrowLeft,Menu,X,UserCircle,Bell} from 'lucide-react';
+import ProductsPage from './pages/ProductsPage.jsx';
+import ProductDetailsPage from './pages/ProductDetailsPage.jsx';
+import CartDrawer from './components/CartDrawer.jsx';
+import CheckoutPage from './pages/CheckoutPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import AuthPage from './pages/AuthPage.jsx';
+import AccountPage from './pages/AccountPage.jsx';
+import OrderDetailsPage from './pages/OrderDetailsPage.jsx';
+import GroupOrderPage from './pages/GroupOrderPage.jsx';
+import GroupOrderDetailsPage from './pages/GroupOrderDetailsPage.jsx';
+import QuoteDetailsPage from './pages/QuoteDetailsPage.jsx';
+import AdminLoginPage from './pages/AdminLoginPage.jsx';
+import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
+import {FAQSection,GallerySection} from './components/EngagementSections.jsx';
+import {CartProvider,useCart} from './context/CartContext.jsx';
+import {AuthProvider,useAuth} from './context/AuthContext.jsx';
+import Seo from './components/Seo.jsx';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
+
+function Footer({onProducts,onGroup,onAuth}){return <footer className="site-footer"><div className="footer-brand"><img src="/reflect-logo.png" alt="REFLECT"/><p>كل حاجة ليوم التخرج في مكان واحد.<br/>إنتِ عيشي اللحظة، وإحنا نهتم بالباقي. ✨</p></div><div><h4>روحي فين؟</h4><button onClick={onProducts}>المنتجات</button><button onClick={onGroup}>جهزوا الدفعة</button><button onClick={onAuth}>حسابي</button></div><div><h4>محتاجين نتكلم؟</h4><a href="#faq">الأسئلة الشائعة</a><a href="#services">خدماتنا</a><a href="#about">عن REFLECT</a></div><div><h4>تابعينا ✦</h4><p className="footer-social">Instagram · TikTok · WhatsApp</p><span className="footer-badge">Made for your main character moment.</span></div><div className="footer-bottom"><span>© 2026 REFLECT. كل الحقوق محفوظة.</span><span>Privacy · Terms</span></div></footer>}
+
+function AppInner(){
+ const [page,setPage]=useState(window.location.hash==='#admin'?'admin-login':'auth'),[productId,setProductId]=useState(null),[orderId,setOrderId]=useState(null),[groupId,setGroupId]=useState(null),[quoteId,setQuoteId]=useState(null),[cartOpen,setCartOpen]=useState(false),[mobile,setMobile]=useState(false);
+ const {count}=useCart();const {isAuthenticated,logout}=useAuth();
+ useEffect(()=>{const fn=()=>setPage('checkout');const login=()=>setPage('auth');window.addEventListener('reflect-checkout',fn);window.addEventListener('reflect-login',login);return()=>{window.removeEventListener('reflect-checkout',fn);window.removeEventListener('reflect-login',login)}},[]);
+ const openProduct=id=>{setProductId(id);setPage('product');window.scrollTo(0,0)};
+ const goProducts=()=>{setPage('products');setMobile(false);window.scrollTo(0,0)};
+ const goAccount=()=>{if(isAuthenticated)setPage('account');else setPage('auth');window.scrollTo(0,0)};
+ const goGroup=()=>{if(isAuthenticated)setPage('group');else setPage('auth');window.scrollTo(0,0)};
+ const afterLogin=()=>setPage('account');
+ return <main>
+ <Seo title={page==='home'?'REFLECT | ملابس وتجهيزات التخرج':page==='products'?'منتجات التخرج | REFLECT':page==='group'?'جهز دفعتك | REFLECT':'REFLECT | Graduation & Apparel'} />
+ {page!=='auth'&&<header className="nav">
+  <button className="mobile-menu" onClick={()=>setMobile(!mobile)}>{mobile?<X/>:<Menu/>}</button>
+  <img src="/reflect-logo.png" alt="REFLECT" onDoubleClick={()=>setPage("admin-login")}/>
+  <nav className={mobile?'mobile-open':''}><a onClick={()=>{setPage('home');setMobile(false)}}>الرئيسية</a><a onClick={goProducts}>المنتجات</a><a href="#services" onClick={()=>setMobile(false)}>خدماتنا</a><a onClick={()=>{goGroup();setMobile(false)}}>جهز دفعتك</a><a href="#faq" onClick={()=>{setPage('home');setMobile(false)}}>الأسئلة</a><a href="#about" onClick={()=>setMobile(false)}>عن REFLECT</a></nav>
+  <div className="actions"><button className="notif-nav" title="الإشعارات" onClick={goAccount}><Bell size={18}/></button><button className="ghost">EN</button><button className="cart-nav" onClick={()=>setCartOpen(true)}><ShoppingBag size={19}/>{count>0&&<span>{count}</span>}</button><button className="account-nav" onClick={goAccount}><UserCircle size={20}/></button><button className="login" onClick={goAccount}>{isAuthenticated?'حسابي':'تسجيل الدخول'}</button></div>
+ </header>}
+
+ {page==='home'&&<><section className="hero"><div className="pattern"></div><div className="copy"><span className="eyebrow">REFLECT • GRADUATION & APPAREL</span><h1>يوم التخرج بيتعاش<br/><em>مرة واحدة..</em> خليه يستاهل</h1><p>كل مستلزمات يوم التخرج في مكان واحد.. من أول التصميم لحد آخر تفصيلة.</p><div className="ctas"><button className="primary" onClick={goProducts}>تصفح المنتجات <ArrowLeft size={18}/></button><button className="secondary" onClick={goGroup}><Users size={18}/> جهز دفعتك</button></div><div className="trust"><span>تصميم مخصص</span><i></i><span>تجهيز دفعات</span><i></i><span>منتجات تخرج</span></div></div><div className="visual"><div className="gold-ring"></div><img src="/reflect-logo.png" alt="REFLECT" onDoubleClick={()=>setPage("admin-login")}/><div className="tag">YOUR MOMENT.<br/><b>REFLECT IT.</b></div></div></section><section className="strip"><span>GRADUATION GOWNS</span><span>•</span><span>CUSTOM APPAREL</span><span>•</span><span>GROUP PACKAGES</span><span>•</span><span>AWARDS</span></section><FAQSection/><GallerySection/><section className="intro"><span className="eyebrow">اختار اللي يناسب لحظتك</span><h2>أكثر من مجرد <em>منتجات تخرج</em></h2><p>منتجات جاهزة للشراء، ومعها تجربة مخصصة لتجهيز دفعات التخرج.</p><button className="primary intro-btn" onClick={goProducts}>استكشف المنتجات</button></section><Footer onProducts={goProducts} onGroup={goGroup} onAuth={()=>setPage('auth')}/></>}
+ {page==='products'&&<ProductsPage onOpen={openProduct}/>}
+ {page==='product'&&<ProductDetailsPage id={productId} onBack={goProducts}/>}
+ {page==='checkout'&&<CheckoutPage onBack={()=>setCartOpen(true)} onLogin={()=>setPage('auth')} onSuccess={()=>setPage('account')}/>}
+ {page==='auth'&&<AuthPage onSuccess={afterLogin}/>}
+ {page==='login'&&<LoginPage onSuccess={afterLogin} onRegister={()=>setPage('auth')}/>}
+ {page==='register'&&<RegisterPage onSuccess={afterLogin} onLogin={()=>setPage('auth')}/>}
+ {page==='account'&&<AccountPage onLogout={()=>{logout();setPage('home')}} onOrder={id=>{setOrderId(id);setPage('order')}} onGroup={id=>{setGroupId(id);setPage('group-detail')}} onQuote={id=>{setQuoteId(id);setPage('quote-detail')}}/>}
+ {page==='order'&&<OrderDetailsPage id={orderId} onBack={()=>setPage('account')}/>}
+ {page==='group'&&<GroupOrderPage onBack={()=>setPage('home')}/>}
+ {page==='group-detail'&&<GroupOrderDetailsPage id={groupId} onBack={()=>setPage('account')}/>}
+ {page==='quote-detail'&&<QuoteDetailsPage id={quoteId} onBack={()=>setPage('account')}/>}
+ {page==='admin-login'&&<AdminLoginPage onSuccess={()=>setPage('admin')} onBack={()=>setPage('home')}/>}
+ {page==='admin'&&<AdminDashboardPage onLogout={()=>setPage('admin-login')} onBack={()=>setPage('home')}/>} 
+ {page!=='auth'&&<a className="wa" href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER||"201000000000"}`} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={24}/></a>}
+ <CartDrawer open={cartOpen} onClose={()=>setCartOpen(false)}/>
+</main>
+}
+export default function App(){return <ErrorBoundary><AuthProvider><CartProvider><AppInner/></CartProvider></AuthProvider></ErrorBoundary>}

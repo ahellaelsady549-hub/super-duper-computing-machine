@@ -1,0 +1,55 @@
+import React,{useState} from 'react';
+import {Sparkles,ShieldCheck,PartyPopper,ArrowLeft,Eye,EyeOff} from 'lucide-react';
+import {authApi} from '../services/api.js';
+import {useAuth} from '../context/AuthContext.jsx';
+
+const perks=[
+ ['خلي يومك مختلف','اختاري اللوك والـ vibe اللي شبهك.'],
+ ['كل حاجة في مكانها','طلباتك وتفاصيلك محفوظة عندنا.'],
+ ['الدفعة كلها؟ ولا يهمك','جهزي دفعتك من أول التصميم لحد التسليم.']
+];
+
+export default function AuthPage({onSuccess}){
+ const {save}=useAuth();
+ const [mode,setMode]=useState('register');
+ const [loading,setLoading]=useState(false); const [error,setError]=useState('');
+ const [showPass,setShowPass]=useState(false);
+ const [form,setForm]=useState({fullName:'',email:'',password:'',phone:'',whatsapp:'',university:'',faculty:'',department:''});
+ const update=e=>setForm({...form,[e.target.name]:e.target.value});
+ const switchMode=m=>{setMode(m);setError('');setShowPass(false)};
+ async function submit(e){e.preventDefault();setError('');setLoading(true);try{
+   const data=mode==='register'?await authApi.register(form):await authApi.login({email:form.email,password:form.password});
+   save(data); onSuccess();
+  }catch(e){setError(e.message||'حصلت مشكلة، جربي تاني.')}finally{setLoading(false)}}
+ return <section className="auth-landing">
+   <div className="auth-art">
+    <div className="auth-orb orb-a"/><div className="auth-orb orb-b"/><div className="auth-grid"/>
+    <div className="auth-brand"><img src="/reflect-logo.png" alt="REFLECT"/><span>GRADUATION & APPAREL</span></div>
+    <div className="auth-copy">
+      <span className="genz-pill"><Sparkles size={15}/> WELCOME TO REFLECT</span>
+      <h1>يوم التخرج؟<br/><span>اعمليه على مزاجك.</span></h1>
+      <p>إحنا نهتم بالتفاصيل، وإنتِ عيشي اللحظة. من أول الـ outfit لحد آخر صورة.</p>
+      <div className="auth-perks">{perks.map(([title,text],i)=><div className="auth-perk" key={title}><span className="perk-icon">{i===0?<Sparkles/>:i===1?<ShieldCheck/>:<PartyPopper/>}</span><div><b>{title}</b><small>{text}</small></div></div>)}</div>
+    </div>
+    <div className="floating-sticker">YOUR MOMENT.<br/><strong>REFLECT IT ✦</strong></div>
+   </div>
+   <div className="auth-panel">
+    <div className="auth-panel-top"><button className="mini-logo" onClick={onSuccess}><img src="/reflect-logo.png" alt="REFLECT"/></button><span>جاهزة؟ ✦</span></div>
+    <div className="auth-box">
+      <div className="auth-tabs"><button className={mode==='register'?'active':''} onClick={()=>switchMode('register')}>حساب جديد</button><button className={mode==='login'?'active':''} onClick={()=>switchMode('login')}>دخول</button></div>
+      <div className="auth-heading"><span>{mode==='register'?'LET’S MAKE IT OFFICIAL':'WELCOME BACK'}</span><h2>{mode==='register'?'يلا نبدأ الحكاية ✨':'وحشتينا! 👋'}</h2><p>{mode==='register'?'اعملي حسابك في دقيقة وخلينا نهتم بالباقي.':'دخلي بياناتك ونكمّل من حيث وقفنا.'}</p></div>
+      <form onSubmit={submit} className="modern-auth-form">
+       {mode==='register'&&<label>اسمك إيه؟<input name="fullName" placeholder="مثلاً: فاطمة علي" value={form.fullName} onChange={update} required/></label>}
+       <label>الإيميل<input name="email" type="email" placeholder="name@example.com" value={form.email} onChange={update} required/></label>
+       {mode==='register'&&<div className="two-inputs"><label>الموبايل<input name="phone" placeholder="01xxxxxxxxx" value={form.phone} onChange={update}/></label><label>واتساب<input name="whatsapp" placeholder="01xxxxxxxxx" value={form.whatsapp} onChange={update}/></label></div>}
+       <label>الباسورد<div className="password-wrap"><input name="password" type={showPass?'text':'password'} placeholder="••••••••" value={form.password} onChange={update} minLength={6} required/><button type="button" onClick={()=>setShowPass(!showPass)}>{showPass?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></label>
+       {mode==='register'&&<div className="two-inputs"><label>الجامعة<input name="university" placeholder="جامعتك" value={form.university} onChange={update}/></label><label>الكلية<input name="faculty" placeholder="كليتك" value={form.faculty} onChange={update}/></label></div>}
+       {error&&<div className="form-error">{error}</div>}
+       <button className="auth-main-btn" disabled={loading}>{loading?'لحظة بس...':mode==='register'?'اعملي الحساب ✨':'دخول على REFLECT'}<ArrowLeft size={18}/></button>
+      </form>
+      <p className="auth-switch">{mode==='register'?'عندك حساب بالفعل؟':'لسه جديدة هنا؟'} <button onClick={()=>switchMode(mode==='register'?'login':'register')}>{mode==='register'?'سجلي دخول':'اعملي حساب'}</button></p>
+    </div>
+    <small className="auth-note">بإنشاء الحساب إنتِ موافقة على الشروط وسياسة الخصوصية.</small>
+   </div>
+ </section>
+}

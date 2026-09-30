@@ -1,0 +1,15 @@
+import express from 'express';
+import {requireAuth} from '../middleware/auth.js';
+import {reviewLimiter} from '../middleware/rateLimiters.js';
+import {productReviews,createReview,mineReviews,notifications,markNotification,faqs,gallery,experienceReviews,createExperienceReview} from '../controllers/engagementController.js';
+const router=express.Router();
+router.get('/products/:productId/reviews',productReviews);
+router.post('/products/:productId/reviews',requireAuth,reviewLimiter,createReview);
+router.get('/reviews/mine',requireAuth,mineReviews);
+router.get('/notifications',requireAuth,notifications);
+router.patch('/notifications/:id/read',requireAuth,markNotification);
+router.get('/faqs',faqs);
+router.get('/gallery',gallery);
+router.get('/experience-reviews',experienceReviews);
+router.post('/experience-reviews',requireAuth,reviewLimiter,createExperienceReview);
+export default router;
